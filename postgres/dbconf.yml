@@ -1,0 +1,7 @@
+development:
+  driver: postgres
+  dsn: postgres://localhost/syracuse?sslmode=disable
+
+test:
+  driver: postgres
+  dsn: postgres://localhost/syracuse_test?sslmode=disable
