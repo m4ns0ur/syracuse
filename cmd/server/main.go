@@ -7,10 +7,10 @@ import (
 	"log"
 	"net"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/go-toschool/syracuse"
 	"github.com/go-toschool/syracuse/citizens"
 	"github.com/go-toschool/syracuse/postgres"
+	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 
 	_ "github.com/lib/pq"
@@ -73,7 +73,25 @@ func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*c
 
 // Select ...
 func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectRequest) (*citizens.SelectResponse, error) {
-	return nil, nil
+	cc, err := cs.Citizens.Select()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]*citizens.Citizen, 0)
+	for _, c := range cc {
+		data = append(data, &citizens.Citizen{
+			Id:        c.ID,
+			Email:     c.Email,
+			Fullname:  c.Fullname,
+			CreatedAt: c.CreatedAt.Unix(),
+			UpdatedAt: c.UpdatedAt.Unix(),
+		})
+	}
+
+	return &citizens.SelectResponse{
+		Data: data,
+	}, nil
 }
 
 // Create ...
@@ -100,10 +118,46 @@ func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateReques
 
 // Update ...
 func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateRequest) (*citizens.UpdateResponse, error) {
-	return nil, nil
+	u, err := cs.Citizens.Get(gr.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	u.Email = gr.Data.Email
+	u.Fullname = gr.Data.Fullname
+	if err := cs.Citizens.Update(u); err != nil {
+		return nil, err
+	}
+
+	return &citizens.UpdateResponse{
+		Data: &citizens.Citizen{
+			Id:        u.ID,
+			Email:     u.Email,
+			Fullname:  u.Fullname,
+			CreatedAt: u.CreatedAt.Unix(),
+			UpdatedAt: u.UpdatedAt.Unix(),
+		},
+	}, nil
 }
 
 // Delete ...
 func (cs *CitizensService) Delete(ctx context.Context, gr *citizens.DeleteRequest) (*citizens.DeleteResponse, error) {
-	return nil, nil
+	u, err := cs.Citizens.Get(gr.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cs.Citizens.Delete(u); err != nil {
+		return nil, err
+	}
+
+	return &citizens.DeleteResponse{
+		Data: &citizens.Citizen{
+			Id:        u.ID,
+			Email:     u.Email,
+			Fullname:  u.Fullname,
+			CreatedAt: u.CreatedAt.Unix(),
+			UpdatedAt: u.UpdatedAt.Unix(),
+		},
+	}, nil
 }
