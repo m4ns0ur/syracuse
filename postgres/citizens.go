@@ -1,9 +1,12 @@
 package postgres
 
 import (
+	"database/sql"
+	"time"
+
 	"github.com/Masterminds/squirrel"
-	"github.com/jmoiron/sqlx"
 	"github.com/go-toschool/syracuse"
+	"github.com/jmoiron/sqlx"
 )
 
 // CitizensService ...
@@ -32,7 +35,29 @@ func (cs *CitizensService) Get(ID string) (*syracuse.Citizen, error) {
 
 // Select ...
 func (cs *CitizensService) Select() ([]*syracuse.Citizen, error) {
-	return nil, nil
+	query := squirrel.Select("*").From("users")
+
+	sql, args, err := query.PlaceholderFormat(squirrel.Dollar).ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := cs.Store.Queryx(sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	cc := make([]*syracuse.Citizen, 0)
+
+	for rows.Next() {
+		c := &syracuse.Citizen{}
+		if err := rows.StructScan(c); err != nil {
+			return nil, err
+		}
+		cc = append(cc, c)
+	}
+
+	return cc, nil
 }
 
 // Create ...
@@ -57,11 +82,34 @@ func (cs *CitizensService) Create(c *syracuse.Citizen) error {
 }
 
 // Update ...
-func (cs *CitizensService) Update(*syracuse.Citizen) error {
-	return nil
+func (cs *CitizensService) Update(c *syracuse.Citizen) error {
+	sql, args, err := squirrel.Update("users").
+		Set("email", c.Email).
+		Set("fullname", c.Fullname).
+		Suffix("returning *").
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return err
+	}
+
+	row := cs.Store.QueryRowx(sql, args...)
+	return row.StructScan(c)
 }
 
 // Delete ...
-func (cs *CitizensService) Delete(*syracuse.Citizen) error {
+func (cs *CitizensService) Delete(c *syracuse.Citizen) error {
+	row := cs.Store.QueryRowx(
+		"update users set deleted_at = $1 where id = $2 returning *",
+		time.Now(), c.ID,
+	)
+
+	if err := row.StructScan(c); err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+		return err
+	}
+
 	return nil
 }
