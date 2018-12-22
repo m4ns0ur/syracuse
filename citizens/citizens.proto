@@ -18,6 +18,7 @@ message Citizen {
   int64 created_at = 4;
   int64 updated_at = 5;
 
+  string token = 6;
 }
 
 message GetRequest {
@@ -42,13 +43,18 @@ message CreateResponse {
   Citizen data = 1;
 }
 
-message UpdateRequest {}
+message UpdateRequest {
+  string user_id = 1;
+  Citizen data = 2;
+}
 
 message UpdateResponse {
   Citizen data = 1;
 }
 
-message DeleteRequest {}
+message DeleteRequest {
+  string user_id = 1;
+}
 
 message DeleteResponse {
   Citizen data = 1;
