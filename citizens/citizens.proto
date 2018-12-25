@@ -17,8 +17,6 @@ message Citizen {
 
   int64 created_at = 4;
   int64 updated_at = 5;
-
-  string token = 6;
 }
 
 message GetRequest {
