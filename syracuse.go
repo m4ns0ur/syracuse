@@ -15,9 +15,25 @@ type Citizen struct {
 
 // Citizens ...
 type Citizens interface {
-	Get(string) (*Citizen, error)
+	Get(*CitizensQuery) (*Citizen, error)
 	Select() ([]*Citizen, error)
 	Create(*Citizen) error
 	Update(*Citizen) error
 	Delete(*Citizen) error
+}
+
+// CitizensStore ...
+type CitizensStore interface {
+	Get(*CitizensQuery) (*Citizen, error)
+	Select() ([]*Citizen, error)
+	Create(*Citizen) error
+	Update(*Citizen) error
+	Delete(*Citizen) error
+}
+
+// CitizensQuery ...
+type CitizensQuery struct {
+	ID       string
+	Email    string
+	Fullname string
 }
