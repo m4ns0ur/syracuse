@@ -55,7 +55,9 @@ type CitizensService struct {
 
 // Get ...
 func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*citizens.GetResponse, error) {
-	c, err := cs.Citizens.Get(gr.GetUserId())
+	c, err := cs.Citizens.Get(&syracuse.CitizensQuery{
+		ID: gr.GetUserId(),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -101,24 +103,41 @@ func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateReques
 		Fullname: gr.Data.Fullname,
 	}
 
-	if err := cs.Citizens.Create(c); err != nil {
-		return nil, err
+	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
+		Email: gr.Data.Email,
+	})
+	if err != nil {
+		if err := cs.Citizens.Create(c); err != nil {
+			return nil, err
+		}
+
+		return &citizens.CreateResponse{
+			Data: &citizens.Citizen{
+				Id:        c.ID,
+				Email:     c.Email,
+				Fullname:  c.Fullname,
+				CreatedAt: c.CreatedAt.Unix(),
+				UpdatedAt: c.UpdatedAt.Unix(),
+			},
+		}, nil
 	}
 
 	return &citizens.CreateResponse{
 		Data: &citizens.Citizen{
-			Id:        c.ID,
-			Email:     c.Email,
-			Fullname:  c.Fullname,
-			CreatedAt: c.CreatedAt.Unix(),
-			UpdatedAt: c.UpdatedAt.Unix(),
+			Id:        u.ID,
+			Email:     u.Email,
+			Fullname:  u.Fullname,
+			CreatedAt: u.CreatedAt.Unix(),
+			UpdatedAt: u.UpdatedAt.Unix(),
 		},
 	}, nil
 }
 
 // Update ...
 func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateRequest) (*citizens.UpdateResponse, error) {
-	u, err := cs.Citizens.Get(gr.UserId)
+	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
+		ID: gr.UserId,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +161,9 @@ func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateReques
 
 // Delete ...
 func (cs *CitizensService) Delete(ctx context.Context, gr *citizens.DeleteRequest) (*citizens.DeleteResponse, error) {
-	u, err := cs.Citizens.Get(gr.UserId)
+	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
+		ID: gr.UserId,
+	})
 	if err != nil {
 		return nil, err
 	}
