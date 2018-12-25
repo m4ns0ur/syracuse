@@ -15,9 +15,20 @@ type CitizensService struct {
 }
 
 // Get ...
-func (cs *CitizensService) Get(ID string) (*syracuse.Citizen, error) {
-	query := squirrel.Select("*").From("users").Where("id = ?", ID).Where("deleted_at is null")
+func (cs *CitizensService) Get(q *syracuse.CitizensQuery) (*syracuse.Citizen, error) {
+	query := squirrel.Select("*").From("users").Where("deleted_at is null")
 
+	if q.ID != "" {
+		query = query.Where("id = ?", q.ID)
+	}
+
+	if q.Email != "" {
+		query = query.Where("email = ?", q.Email)
+	}
+
+	if q.Fullname != "" {
+		query = query.Where("fullname = ?", q.Fullname)
+	}
 	sql, args, err := query.PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
 		return nil, err
@@ -35,7 +46,7 @@ func (cs *CitizensService) Get(ID string) (*syracuse.Citizen, error) {
 
 // Select ...
 func (cs *CitizensService) Select() ([]*syracuse.Citizen, error) {
-	query := squirrel.Select("*").From("users")
+	query := squirrel.Select("*").From("users").Where("deleted_at is null")
 
 	sql, args, err := query.PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
@@ -112,4 +123,23 @@ func (cs *CitizensService) Delete(c *syracuse.Citizen) error {
 	}
 
 	return nil
+}
+
+// GetByEmail ...
+func (cs *CitizensService) GetByEmail(email string) (*syracuse.Citizen, error) {
+	query := squirrel.Select("*").From("users").Where("email = ?", email).Where("deleted_at is null")
+
+	sql, args, err := query.PlaceholderFormat(squirrel.Dollar).ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	row := cs.Store.QueryRowx(sql, args...)
+
+	c := &syracuse.Citizen{}
+	if err := row.StructScan(c); err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }
