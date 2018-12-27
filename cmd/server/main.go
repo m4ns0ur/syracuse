@@ -21,7 +21,7 @@ func main() {
 	postgresDSN := flag.String("postgres-dsn", "postgres://localhost:5432/syracuse?sslmode=disable", "Postgres DSN")
 
 	flag.Parse()
-
+	fmt.Println(*postgresDSN)
 	db, err := sqlx.Connect("postgres", *postgresDSN)
 	if err != nil {
 		log.Fatalf("Failed to connect to postgres: %v", err)
