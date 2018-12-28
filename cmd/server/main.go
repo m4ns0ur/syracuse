@@ -48,12 +48,12 @@ func main() {
 
 }
 
-// CitizensService ...
+// CitizensService grpc service implementation.
 type CitizensService struct {
 	Citizens syracuse.Citizens
 }
 
-// Get ...
+// Get Gets a user by ID.
 func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*citizens.GetResponse, error) {
 	c, err := cs.Citizens.Get(&syracuse.CitizensQuery{
 		ID: gr.GetUserId(),
@@ -73,7 +73,7 @@ func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*c
 	}, nil
 }
 
-// Select ...
+// Select return a collection of users.
 func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectRequest) (*citizens.SelectResponse, error) {
 	cc, err := cs.Citizens.Select()
 	if err != nil {
@@ -96,7 +96,7 @@ func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectReques
 	}, nil
 }
 
-// Create ...
+// Create creates a new user into database.
 func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateRequest) (*citizens.CreateResponse, error) {
 	c := &syracuse.Citizen{
 		Email:    gr.Data.Email,
@@ -133,7 +133,7 @@ func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateReques
 	}, nil
 }
 
-// Update ...
+// Update updates a user.
 func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateRequest) (*citizens.UpdateResponse, error) {
 	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
 		ID: gr.UserId,
@@ -159,7 +159,7 @@ func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateReques
 	}, nil
 }
 
-// Delete ...
+// Delete delete a user.
 func (cs *CitizensService) Delete(ctx context.Context, gr *citizens.DeleteRequest) (*citizens.DeleteResponse, error) {
 	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
 		ID: gr.UserId,
