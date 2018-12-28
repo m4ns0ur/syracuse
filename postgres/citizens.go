@@ -10,12 +10,12 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// CitizensService ...
+// CitizensService postgres implementation
 type CitizensService struct {
 	Store *sqlx.DB
 }
 
-// Get ...
+// Get gets a record from db
 func (cs *CitizensService) Get(q *syracuse.CitizensQuery) (*syracuse.Citizen, error) {
 	query := squirrel.Select("*").From("users").Where("deleted_at is null")
 
@@ -49,7 +49,7 @@ func (cs *CitizensService) Get(q *syracuse.CitizensQuery) (*syracuse.Citizen, er
 	return c, nil
 }
 
-// Select ...
+// Select returns a collectio of users from db.
 func (cs *CitizensService) Select() ([]*syracuse.Citizen, error) {
 	query := squirrel.Select("*").From("users").Where("deleted_at is null")
 
@@ -76,7 +76,7 @@ func (cs *CitizensService) Select() ([]*syracuse.Citizen, error) {
 	return cc, nil
 }
 
-// Create ...
+// Create creates a new user.
 func (cs *CitizensService) Create(c *syracuse.Citizen) error {
 	sql, args, err := squirrel.
 		Insert("users").
@@ -97,7 +97,7 @@ func (cs *CitizensService) Create(c *syracuse.Citizen) error {
 	return nil
 }
 
-// Update ...
+// Update updates the given user.
 func (cs *CitizensService) Update(c *syracuse.Citizen) error {
 	sql, args, err := squirrel.Update("users").
 		Set("email", c.Email).
@@ -113,7 +113,7 @@ func (cs *CitizensService) Update(c *syracuse.Citizen) error {
 	return row.StructScan(c)
 }
 
-// Delete ...
+// Delete logical delete.
 func (cs *CitizensService) Delete(c *syracuse.Citizen) error {
 	row := cs.Store.QueryRowx(
 		"update users set deleted_at = $1 where id = $2 returning *",

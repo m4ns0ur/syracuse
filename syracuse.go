@@ -2,7 +2,7 @@ package syracuse
 
 import "time"
 
-// Citizen ...
+// Citizen represents a user.
 type Citizen struct {
 	ID       string `json:"id" db:"id"`
 	Email    string `json:"email" db:"email"`
@@ -13,7 +13,7 @@ type Citizen struct {
 	DeletedAt *time.Time `json:"-" db:"deleted_at"`
 }
 
-// Citizens ...
+// Citizens basic method that need to be implemented in order to operate over users.
 type Citizens interface {
 	Get(*CitizensQuery) (*Citizen, error)
 	Select() ([]*Citizen, error)
@@ -22,7 +22,7 @@ type Citizens interface {
 	Delete(*Citizen) error
 }
 
-// CitizensStore ...
+// CitizensStore crud methods to make queries over some database. Any struct that implementes this methods could use Citizen.
 type CitizensStore interface {
 	Get(*CitizensQuery) (*Citizen, error)
 	Select() ([]*Citizen, error)
@@ -31,7 +31,7 @@ type CitizensStore interface {
 	Delete(*Citizen) error
 }
 
-// CitizensQuery ...
+// CitizensQuery represents queries that helps to query users.
 type CitizensQuery struct {
 	ID       string
 	Email    string

@@ -45,7 +45,6 @@ func main() {
 	if err := srv.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
-
 }
 
 // CitizensService grpc service implementation.
