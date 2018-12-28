@@ -11,7 +11,7 @@ REGISTRY_URL=gotoschool
 
 proto p:
 	@echo "[proto] Generating golang proto..."
-	@rm $(PROTO_SVC)/$(PROTO_SVC).pb.go
+	@rm -f $(PROTO_SVC)/$(PROTO_SVC).pb.go
 	@protoc  -I $(PROTO_SVC)/ $(PROTO_SVC)/$(PROTO_SVC).proto --go_out=plugins=grpc:$(PROTO_SVC)
 
 run r: proto
