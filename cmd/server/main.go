@@ -66,7 +66,7 @@ func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*c
 		Data: &citizens.Citizen{
 			Id:        c.ID,
 			Email:     c.Email,
-			Fullname:  c.Fullname,
+			FullName:  c.FullName,
 			CreatedAt: c.CreatedAt.Unix(),
 			UpdatedAt: c.UpdatedAt.Unix(),
 		},
@@ -85,7 +85,7 @@ func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectReques
 		data = append(data, &citizens.Citizen{
 			Id:        c.ID,
 			Email:     c.Email,
-			Fullname:  c.Fullname,
+			FullName:  c.FullName,
 			CreatedAt: c.CreatedAt.Unix(),
 			UpdatedAt: c.UpdatedAt.Unix(),
 		})
@@ -100,7 +100,7 @@ func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectReques
 func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateRequest) (*citizens.CreateResponse, error) {
 	c := &syracuse.Citizen{
 		Email:    gr.Data.Email,
-		Fullname: gr.Data.Fullname,
+		FullName: gr.Data.FullName,
 	}
 
 	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
@@ -115,7 +115,7 @@ func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateReques
 			Data: &citizens.Citizen{
 				Id:        c.ID,
 				Email:     c.Email,
-				Fullname:  c.Fullname,
+				FullName:  c.FullName,
 				CreatedAt: c.CreatedAt.Unix(),
 				UpdatedAt: c.UpdatedAt.Unix(),
 			},
@@ -126,7 +126,7 @@ func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateReques
 		Data: &citizens.Citizen{
 			Id:        u.ID,
 			Email:     u.Email,
-			Fullname:  u.Fullname,
+			FullName:  u.FullName,
 			CreatedAt: u.CreatedAt.Unix(),
 			UpdatedAt: u.UpdatedAt.Unix(),
 		},
@@ -143,7 +143,7 @@ func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateReques
 	}
 
 	u.Email = gr.Data.Email
-	u.Fullname = gr.Data.Fullname
+	u.FullName = gr.Data.FullName
 	if err := cs.Citizens.Update(u); err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateReques
 		Data: &citizens.Citizen{
 			Id:        u.ID,
 			Email:     u.Email,
-			Fullname:  u.Fullname,
+			FullName:  u.FullName,
 			CreatedAt: u.CreatedAt.Unix(),
 			UpdatedAt: u.UpdatedAt.Unix(),
 		},
@@ -176,7 +176,7 @@ func (cs *CitizensService) Delete(ctx context.Context, gr *citizens.DeleteReques
 		Data: &citizens.Citizen{
 			Id:        u.ID,
 			Email:     u.Email,
-			Fullname:  u.Fullname,
+			FullName:  u.FullName,
 			CreatedAt: u.CreatedAt.Unix(),
 			UpdatedAt: u.UpdatedAt.Unix(),
 		},

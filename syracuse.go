@@ -6,7 +6,7 @@ import "time"
 type Citizen struct {
 	ID       string `json:"id" db:"id"`
 	Email    string `json:"email" db:"email"`
-	Fullname string `json:"fullname" db:"fullname"`
+	FullName string `json:"full_name" db:"full_name"`
 
 	CreatedAt time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at" db:"updated_at"`
@@ -35,5 +35,5 @@ type CitizensStore interface {
 type CitizensQuery struct {
 	ID       string
 	Email    string
-	Fullname string
+	FullName string
 }

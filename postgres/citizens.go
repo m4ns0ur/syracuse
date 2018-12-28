@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -18,6 +19,10 @@ type CitizensService struct {
 func (cs *CitizensService) Get(q *syracuse.CitizensQuery) (*syracuse.Citizen, error) {
 	query := squirrel.Select("*").From("users").Where("deleted_at is null")
 
+	if q.ID == "" && q.Email == "" && q.FullName == "" {
+		return nil, errors.New("must provide a query")
+	}
+
 	if q.ID != "" {
 		query = query.Where("id = ?", q.ID)
 	}
@@ -26,8 +31,8 @@ func (cs *CitizensService) Get(q *syracuse.CitizensQuery) (*syracuse.Citizen, er
 		query = query.Where("email = ?", q.Email)
 	}
 
-	if q.Fullname != "" {
-		query = query.Where("fullname = ?", q.Fullname)
+	if q.FullName != "" {
+		query = query.Where("full_name = ?", q.FullName)
 	}
 	sql, args, err := query.PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
@@ -75,8 +80,8 @@ func (cs *CitizensService) Select() ([]*syracuse.Citizen, error) {
 func (cs *CitizensService) Create(c *syracuse.Citizen) error {
 	sql, args, err := squirrel.
 		Insert("users").
-		Columns("email", "fullname").
-		Values(c.Email, c.Fullname).
+		Columns("email", "full_name").
+		Values(c.Email, c.FullName).
 		Suffix("returning *").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -96,7 +101,7 @@ func (cs *CitizensService) Create(c *syracuse.Citizen) error {
 func (cs *CitizensService) Update(c *syracuse.Citizen) error {
 	sql, args, err := squirrel.Update("users").
 		Set("email", c.Email).
-		Set("fullname", c.Fullname).
+		Set("full_name", c.FullName).
 		Suffix("returning *").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
@@ -123,23 +128,4 @@ func (cs *CitizensService) Delete(c *syracuse.Citizen) error {
 	}
 
 	return nil
-}
-
-// GetByEmail ...
-func (cs *CitizensService) GetByEmail(email string) (*syracuse.Citizen, error) {
-	query := squirrel.Select("*").From("users").Where("email = ?", email).Where("deleted_at is null")
-
-	sql, args, err := query.PlaceholderFormat(squirrel.Dollar).ToSql()
-	if err != nil {
-		return nil, err
-	}
-
-	row := cs.Store.QueryRowx(sql, args...)
-
-	c := &syracuse.Citizen{}
-	if err := row.StructScan(c); err != nil {
-		return nil, err
-	}
-
-	return c, nil
 }
