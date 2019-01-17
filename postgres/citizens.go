@@ -102,6 +102,7 @@ func (cs *CitizensService) Update(c *syracuse.Citizen) error {
 	sql, args, err := squirrel.Update("users").
 		Set("email", c.Email).
 		Set("full_name", c.FullName).
+		Where("id = ?", c.ID).
 		Suffix("returning *").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
