@@ -62,13 +62,7 @@ func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*c
 	}
 
 	return &citizens.GetResponse{
-		Data: &citizens.Citizen{
-			Id:        c.ID,
-			Email:     c.Email,
-			FullName:  c.FullName,
-			CreatedAt: c.CreatedAt.Unix(),
-			UpdatedAt: c.UpdatedAt.Unix(),
-		},
+		Data: c.ToProto(),
 	}, nil
 }
 
@@ -81,13 +75,7 @@ func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectReques
 
 	data := make([]*citizens.Citizen, 0)
 	for _, c := range cc {
-		data = append(data, &citizens.Citizen{
-			Id:        c.ID,
-			Email:     c.Email,
-			FullName:  c.FullName,
-			CreatedAt: c.CreatedAt.Unix(),
-			UpdatedAt: c.UpdatedAt.Unix(),
-		})
+		data = append(data, c.ToProto())
 	}
 
 	return &citizens.SelectResponse{
@@ -97,38 +85,26 @@ func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectReques
 
 // Create creates a new user into database.
 func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateRequest) (*citizens.CreateResponse, error) {
-	c := &syracuse.Citizen{
-		Email:    gr.Data.Email,
-		FullName: gr.Data.FullName,
-	}
-
 	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
 		Email: gr.Data.Email,
 	})
 	if err != nil {
+		c := &syracuse.Citizen{
+			Email:    gr.Data.Email,
+			FullName: gr.Data.FullName,
+		}
+
 		if err := cs.Citizens.Create(c); err != nil {
 			return nil, err
 		}
 
 		return &citizens.CreateResponse{
-			Data: &citizens.Citizen{
-				Id:        c.ID,
-				Email:     c.Email,
-				FullName:  c.FullName,
-				CreatedAt: c.CreatedAt.Unix(),
-				UpdatedAt: c.UpdatedAt.Unix(),
-			},
+			Data: c.ToProto(),
 		}, nil
 	}
 
 	return &citizens.CreateResponse{
-		Data: &citizens.Citizen{
-			Id:        u.ID,
-			Email:     u.Email,
-			FullName:  u.FullName,
-			CreatedAt: u.CreatedAt.Unix(),
-			UpdatedAt: u.UpdatedAt.Unix(),
-		},
+		Data: u.ToProto(),
 	}, nil
 }
 
@@ -148,13 +124,7 @@ func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateReques
 	}
 
 	return &citizens.UpdateResponse{
-		Data: &citizens.Citizen{
-			Id:        u.ID,
-			Email:     u.Email,
-			FullName:  u.FullName,
-			CreatedAt: u.CreatedAt.Unix(),
-			UpdatedAt: u.UpdatedAt.Unix(),
-		},
+		Data: u.ToProto(),
 	}, nil
 }
 
@@ -172,12 +142,6 @@ func (cs *CitizensService) Delete(ctx context.Context, gr *citizens.DeleteReques
 	}
 
 	return &citizens.DeleteResponse{
-		Data: &citizens.Citizen{
-			Id:        u.ID,
-			Email:     u.Email,
-			FullName:  u.FullName,
-			CreatedAt: u.CreatedAt.Unix(),
-			UpdatedAt: u.UpdatedAt.Unix(),
-		},
+		Data: u.ToProto(),
 	}, nil
 }
