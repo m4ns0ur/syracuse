@@ -29,12 +29,10 @@ func main() {
 	}
 
 	srv := grpc.NewServer()
-
-	citizens.RegisterCitizenshipServer(srv, &CitizensService{
-		Citizens: &service.Citizens{
-			Store: pgSvc,
-		},
-	})
+	svc := &CitizensService{
+		Citizens: service.NewCitizens(pgSvc),
+	}
+	citizens.RegisterCitizenshipServer(srv, svc)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {

@@ -5,6 +5,13 @@ import (
 	"github.com/go-toschool/syracuse/database"
 )
 
+// NewCitizens expose a new citizens service.
+func NewCitizens(store database.Store) *Citizens {
+	return &Citizens{
+		Store: store,
+	}
+}
+
 // Citizens postgres implementation
 type Citizens struct {
 	Store database.Store
