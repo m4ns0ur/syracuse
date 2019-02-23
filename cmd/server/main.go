@@ -55,26 +55,26 @@ type CitizensService struct {
 
 // Get Gets a user by ID.
 func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*citizens.GetResponse, error) {
-	c, err := cs.Citizens.GetByID(gr.GetUserId())
+	user, err := cs.Citizens.GetByID(gr.GetUserId())
 	if err != nil {
 		return nil, err
 	}
 
 	return &citizens.GetResponse{
-		Data: c.ToProto(),
+		Data: user.ToProto(),
 	}, nil
 }
 
 // Select return a collection of users.
 func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectRequest) (*citizens.SelectResponse, error) {
-	cc, err := cs.Citizens.Select()
+	users, err := cs.Citizens.Select()
 	if err != nil {
 		return nil, err
 	}
 
 	data := make([]*citizens.Citizen, 0)
-	for _, c := range cc {
-		data = append(data, c.ToProto())
+	for _, user := range users {
+		data = append(data, user.ToProto())
 	}
 
 	return &citizens.SelectResponse{
@@ -85,57 +85,57 @@ func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectReques
 // Create creates a new user into database.
 func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateRequest) (*citizens.CreateResponse, error) {
 	email := gr.GetData().GetEmail()
-	u, err := cs.Citizens.GetByEmail(email)
+	user, err := cs.Citizens.GetByEmail(email)
 	if err != nil {
-		c := &syracuse.Citizen{
-			Email:    gr.Data.Email,
-			FullName: gr.Data.FullName,
+		citizen := &syracuse.Citizen{
+			Email:    gr.GetData().GetEmail(),
+			FullName: gr.GetData().GetFullName(),
 		}
 
-		if err := cs.Citizens.Create(c); err != nil {
+		if err := cs.Citizens.Create(citizen); err != nil {
 			return nil, err
 		}
 
 		return &citizens.CreateResponse{
-			Data: c.ToProto(),
+			Data: citizen.ToProto(),
 		}, nil
 	}
 
 	return &citizens.CreateResponse{
-		Data: u.ToProto(),
+		Data: user.ToProto(),
 	}, nil
 }
 
 // Update updates a user.
 func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateRequest) (*citizens.UpdateResponse, error) {
-	u, err := cs.Citizens.GetByID(gr.GetUserId())
+	user, err := cs.Citizens.GetByID(gr.GetUserId())
 	if err != nil {
 		return nil, err
 	}
 
-	u.Email = gr.Data.Email
-	u.FullName = gr.Data.FullName
-	if err := cs.Citizens.Update(u); err != nil {
+	user.Email = gr.Data.Email
+	user.FullName = gr.Data.FullName
+	if err := cs.Citizens.Update(user); err != nil {
 		return nil, err
 	}
 
 	return &citizens.UpdateResponse{
-		Data: u.ToProto(),
+		Data: user.ToProto(),
 	}, nil
 }
 
 // Delete delete a user.
 func (cs *CitizensService) Delete(ctx context.Context, gr *citizens.DeleteRequest) (*citizens.DeleteResponse, error) {
-	u, err := cs.Citizens.GetByID(gr.GetUserId())
+	user, err := cs.Citizens.GetByID(gr.GetUserId())
 	if err != nil {
 		return nil, err
 	}
 
-	if err := cs.Citizens.Delete(u); err != nil {
+	if err := cs.Citizens.Delete(user); err != nil {
 		return nil, err
 	}
 
 	return &citizens.DeleteResponse{
-		Data: u.ToProto(),
+		Data: user.ToProto(),
 	}, nil
 }
