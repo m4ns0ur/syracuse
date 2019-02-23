@@ -4,8 +4,6 @@ import (
 	"github.com/go-toschool/syracuse"
 	"github.com/go-toschool/syracuse/database/postgres"
 	"github.com/jmoiron/sqlx"
-
-	_ "github.com/lib/pq"
 )
 
 // Store define the behavior for a Store.
