@@ -113,8 +113,8 @@ func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateReques
 		return nil, err
 	}
 
-	user.Email = gr.Data.Email
-	user.FullName = gr.Data.FullName
+	user.Email = gr.GetData().GetEmail()
+	user.FullName = gr.GetData().GetFullName()
 	if err := cs.Citizens.Update(user); err != nil {
 		return nil, err
 	}
