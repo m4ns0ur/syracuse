@@ -19,20 +19,19 @@ type Citizen struct {
 
 // Citizens basic method that need to be implemented in order to operate over users.
 type Citizens interface {
-	Get(*CitizensQuery) (*Citizen, error)
+	CitizensGetter
+
 	Select() ([]*Citizen, error)
 	Create(*Citizen) error
 	Update(*Citizen) error
 	Delete(*Citizen) error
 }
 
-// CitizensStore crud methods to make queries over some database. Any struct that implementes this methods could use Citizen.
-type CitizensStore interface {
-	Get(*CitizensQuery) (*Citizen, error)
-	Select() ([]*Citizen, error)
-	Create(*Citizen) error
-	Update(*Citizen) error
-	Delete(*Citizen) error
+// CitizensGetter getter define behavior to get records.
+type CitizensGetter interface {
+	GetByID(id string) (*Citizen, error)
+	GetByEmail(email string) (*Citizen, error)
+	GetByFullname(fullname string) (*Citizen, error)
 }
 
 // CitizensQuery represents queries that helps to query users.

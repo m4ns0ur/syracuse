@@ -7,10 +7,12 @@ import (
 	"log"
 	"net"
 
+	"github.com/go-toschool/syracuse/database"
+	"github.com/go-toschool/syracuse/service"
+
 	"github.com/go-toschool/syracuse"
 	"github.com/go-toschool/syracuse/citizens"
-	"github.com/go-toschool/syracuse/postgres"
-	"github.com/jmoiron/sqlx"
+
 	"google.golang.org/grpc"
 
 	_ "github.com/lib/pq"
@@ -21,8 +23,7 @@ func main() {
 	postgresDSN := flag.String("postgres-dsn", "postgres://gotoschool:goto1234@localhost:5432/drachma?sslmode=disable", "Postgres DSN")
 
 	flag.Parse()
-	fmt.Println(*postgresDSN)
-	db, err := sqlx.Connect("postgres", *postgresDSN)
+	pgSvc, err := database.NewPostgres(*postgresDSN)
 	if err != nil {
 		log.Fatalf("Failed to connect to postgres: %v", err)
 	}
@@ -30,8 +31,8 @@ func main() {
 	srv := grpc.NewServer()
 
 	citizens.RegisterCitizenshipServer(srv, &CitizensService{
-		Citizens: &postgres.CitizensService{
-			Store: db,
+		Citizens: &service.Citizens{
+			Store: pgSvc,
 		},
 	})
 
@@ -54,9 +55,7 @@ type CitizensService struct {
 
 // Get Gets a user by ID.
 func (cs *CitizensService) Get(ctx context.Context, gr *citizens.GetRequest) (*citizens.GetResponse, error) {
-	c, err := cs.Citizens.Get(&syracuse.CitizensQuery{
-		ID: gr.GetUserId(),
-	})
+	c, err := cs.Citizens.GetByID(gr.GetUserId())
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +84,8 @@ func (cs *CitizensService) Select(ctx context.Context, gr *citizens.SelectReques
 
 // Create creates a new user into database.
 func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateRequest) (*citizens.CreateResponse, error) {
-	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
-		Email: gr.Data.Email,
-	})
+	email := gr.GetData().GetEmail()
+	u, err := cs.Citizens.GetByEmail(email)
 	if err != nil {
 		c := &syracuse.Citizen{
 			Email:    gr.Data.Email,
@@ -110,9 +108,7 @@ func (cs *CitizensService) Create(ctx context.Context, gr *citizens.CreateReques
 
 // Update updates a user.
 func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateRequest) (*citizens.UpdateResponse, error) {
-	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
-		ID: gr.UserId,
-	})
+	u, err := cs.Citizens.GetByID(gr.GetUserId())
 	if err != nil {
 		return nil, err
 	}
@@ -130,9 +126,7 @@ func (cs *CitizensService) Update(ctx context.Context, gr *citizens.UpdateReques
 
 // Delete delete a user.
 func (cs *CitizensService) Delete(ctx context.Context, gr *citizens.DeleteRequest) (*citizens.DeleteResponse, error) {
-	u, err := cs.Citizens.Get(&syracuse.CitizensQuery{
-		ID: gr.UserId,
-	})
+	u, err := cs.Citizens.GetByID(gr.GetUserId())
 	if err != nil {
 		return nil, err
 	}
