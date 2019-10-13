@@ -49,7 +49,7 @@ func (cs *CitizensStore) Get(q *syracuse.CitizensQuery) (*syracuse.Citizen, erro
 	return c, nil
 }
 
-// Select returns a collectio of users from db.
+// Select returns a collection of users from db.
 func (cs *CitizensStore) Select() ([]*syracuse.Citizen, error) {
 	query := squirrel.Select("*").From("users").Where("deleted_at is null")
 

@@ -41,7 +41,7 @@ func (cs *Citizens) GetByFullname(fullname string) (*syracuse.Citizen, error) {
 	return cs.Store.Get(q)
 }
 
-// Select returns a collectio of users from db.
+// Select returns a collection of users from db.
 func (cs *Citizens) Select() ([]*syracuse.Citizen, error) {
 	return cs.Store.Select()
 }
